@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="MedNutrition">
+<meta name="theme-color" content="#0f4c75">
+<title>Medical Nutrition Calculator</title>
+<style>
+:root {
+  --primary: #0f4c75;
+  --primary-light: #1b6ca8;
+  --accent: #00b4d8;
+  --success: #2d9e6b;
+  --warning: #e07b39;
+  --danger: #c0392b;
+  --bg: #f0f4f8;
+  --card: #ffffff;
+  --text: #1a2332;
+  --text2: #5a6a7e;
+  --text3: #8fa0b3;
+  --border: #dde4ed;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 2px 12px rgba(15,76,117,0.10);
+  --shadow-lg: 0 8px 32px rgba(15,76,117,0.15);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+
+/* NAV */
+.nav{background:var(--primary);color:#fff;padding:0;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-lg)}
+.nav-inner{display:flex;align-items:center;gap:0;height:52px}
+.nav-brand{padding:0 16px;font-size:15px;font-weight:700;white-space:nowrap;flex-shrink:0}
+.nav-brand span{color:var(--accent)}
+.nav-tabs{display:flex;overflow-x:auto;scrollbar-width:none;flex:1}
+.nav-tabs::-webkit-scrollbar{display:none}
+.nav-tab{padding:0 16px;height:52px;display:flex;align-items:center;font-size:13px;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;color:rgba(255,255,255,0.7);transition:all .2s;flex-shrink:0}
+.nav-tab.on{color:#fff;border-bottom-color:var(--accent);font-weight:600}
+
+/* PAGES */
+.page{display:none;padding:12px;max-width:800px;margin:0 auto}
+.page.on{display:block}
+
+/* CARDS */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden}
+.card-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2)}
+.card-body{padding:12px 16px}
+
+/* PRODUCT CHIPS */
+.brand-section{margin-bottom:10px}
+.brand-label{font-size:10px;color:var(--text3);font-weight:600;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{padding:4px 10px;border-radius:20px;font-size:11px;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--text2);transition:all .15s;line-height:1.4}
+.chip:active{transform:scale(.96)}
+.chip.on-blue{background:#e8f4fd;color:#1565c0;border-color:#1565c0;font-weight:600}
+.chip.on-green{background:#e8f5e9;color:#1b5e20;border-color:#2e7d32;font-weight:600}
+.chip.on-amber{background:#fff3e0;color:#e65100;border-color:#e65100;font-weight:600}
+.chip.on-red{background:#fdecea;color:#b71c1c;border-color:#c62828;font-weight:600}
+.chip.on-purple{background:#f3e5f5;color:#6a1b9a;border-color:#7b1fa2;font-weight:600}
+
+/* SERVING BOX */
+.sv-box{border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:10px;display:none}
+.sv-box.blue{background:#e3f2fd;border:1px solid #90caf9}
+.sv-box.green{background:#e8f5e9;border:1px solid #a5d6a7}
+.sv-box.amber{background:#fff3e0;border:1px solid #ffcc80}
+.sv-box.red{background:#fdecea;border:1px solid #ef9a9a}
+.sv-box.purple{background:#f3e5f5;border:1px solid #ce93d8}
+.sv-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;color:var(--text2)}
+.sv-row{display:flex;flex-wrap:wrap;gap:8px}
+.sv-item{font-size:11px;color:var(--text)}.sv-item b{color:var(--primary)}
+
+/* INFO BOX */
+.info-box{background:#f8fafc;border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:10px;font-size:11px;color:var(--text2);line-height:1.7;display:none;border:1px solid var(--border)}
+
+/* INPUTS */
+.form-row{display:grid;gap:8px;margin-bottom:10px}
+.form-row.c2{grid-template-columns:1fr 1fr}
+.form-row.c3{grid-template-columns:1fr 1fr 1fr}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg label{font-size:11px;color:var(--text2);font-weight:500}
+input[type=number],select{height:36px;padding:0 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:#fff;color:var(--text);font-size:13px;width:100%;font-family:inherit;transition:border-color .2s}
+input[type=number]:focus,select:focus{outline:none;border-color:var(--accent)}
+input.big{height:44px;font-size:18px;font-weight:700;color:var(--primary)}
+.conc-panel{background:#f0f7ff;border:1.5px solid #b3d9f7;border-radius:var(--radius-sm);padding:12px;margin-bottom:10px}
+.conc-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.conc-input{height:40px;width:80px;padding:0 8px;border:1.5px solid var(--accent);border-radius:var(--radius-sm);font-size:18px;font-weight:700;color:var(--primary);text-align:center;background:#fff;font-family:inherit}
+.conc-input:focus{outline:none;border-color:var(--primary)}
+.preset-chips{display:flex;gap:5px;flex-wrap:wrap}
+.preset{padding:4px 10px;border-radius:20px;font-size:11px;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--text2);font-weight:600;transition:all .15s}
+.preset.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.conc-hint{font-size:10px;color:var(--text3);margin-top:4px}
+
+/* RESULTS */
+.result-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:7px;margin-bottom:10px}
+.result-card{background:var(--bg);border-radius:var(--radius-sm);padding:9px 10px;border:1px solid var(--border)}
+.rc-label{font-size:10px;color:var(--text3);margin-bottom:3px}
+.rc-val{font-size:16px;font-weight:700;color:var(--text);line-height:1.2}
+.rc-unit{font-size:10px;color:var(--text2);margin-top:1px}
+.result-card.blue .rc-val{color:var(--primary-light)}
+.result-card.green .rc-val{color:var(--success)}
+.result-card.amber .rc-val{color:var(--warning)}
+
+/* PROGRESS */
+.prog-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.prog-box{background:var(--bg);border-radius:var(--radius-sm);padding:9px 12px;border:1px solid var(--border)}
+.prog-label{font-size:10px;color:var(--text3);margin-bottom:3px}
+.prog-val{font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px}
+.prog-bar{height:5px;border-radius:3px;background:var(--border);overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;transition:width .4s;background:var(--primary-light)}
+.prog-fill.ok{background:var(--success)}
+.prog-fill.warn{background:var(--warning)}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{text-align:left;padding:6px 8px;border-bottom:2px solid var(--border);color:var(--text2);font-weight:600;white-space:nowrap;background:#f8fafc}
+td{padding:5px 8px;border-bottom:1px solid var(--border);color:var(--text)}
+td.hl{color:var(--primary-light);font-weight:600}
+td.gr{color:var(--success);font-weight:600}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f8fafc}
+
+/* WARN/NOTE */
+.warnbox{font-size:11px;color:var(--warning);margin-top:8px;line-height:1.6;background:#fff8f0;border-radius:var(--radius-sm);padding:8px 10px;border-left:3px solid var(--warning);display:none}
+.notebox{font-size:10px;color:var(--text3);margin-top:6px;line-height:1.5}
+
+/* ADMIN */
+.admin-tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px}
+.admin-tab{padding:6px 14px;border-radius:20px;font-size:12px;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--text2);white-space:nowrap;transition:all .2s}
+.admin-tab.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+.product-list{display:flex;flex-direction:column;gap:8px}
+.product-item{background:#fff;border-radius:var(--radius-sm);padding:12px;border:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.product-item .pi-name{flex:1;font-size:13px;font-weight:600}
+.product-item .pi-brand{font-size:10px;color:var(--text3)}
+.pi-btns{display:flex;gap:6px}
+.btn{padding:6px 14px;border-radius:var(--radius-sm);font-size:12px;cursor:pointer;border:none;font-family:inherit;font-weight:600;transition:all .2s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-success{background:var(--success);color:#fff}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-outline{background:#fff;color:var(--primary);border:1.5px solid var(--primary)}
+.btn-sm{padding:4px 10px;font-size:11px}
+.btn-block{width:100%;text-align:center;padding:10px}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.on{display:flex}
+.modal{background:#fff;border-radius:var(--radius);width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+.modal-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-title{font-size:14px;font-weight:700;color:var(--primary)}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2);padding:0 4px;line-height:1}
+.modal-body{padding:16px}
+.modal-footer{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.form-group input,.form-group select,.form-group textarea{width:100%;height:36px;padding:0 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;background:#fff;color:var(--text);transition:border-color .2s}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--accent)}
+.form-group textarea{height:auto;padding:8px 10px;resize:vertical;min-height:60px}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.section-divider{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a2332;color:#fff;padding:10px 20px;border-radius:24px;font-size:12px;font-weight:600;z-index:300;transition:transform .3s;pointer-events:none;white-space:nowrap}
+.toast.on{transform:translateX(-50%) translateY(0)}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:32px 16px;color:var(--text3)}
+.empty-icon{font-size:36px;margin-bottom:8px}
+.empty-text{font-size:13px}
+
+/* GUIDE */
+.guide-step{display:flex;gap:12px;margin-bottom:16px;align-items:flex-start}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-body{flex:1}
+.step-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+.step-desc{font-size:12px;color:var(--text2);line-height:1.6}
+.step-code{background:#1a2332;color:#7dd3fc;padding:8px 12px;border-radius:var(--radius-sm);font-size:11px;margin-top:6px;font-family:monospace;line-height:1.6}
+.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;text-transform:uppercase}
+.badge-blue{background:#e3f2fd;color:#1565c0}
+.badge-green{background:#e8f5e9;color:#1b5e20}
+.badge-orange{background:#fff3e0;color:#e65100}
+.highlight-box{background:#f0f7ff;border:1px solid #b3d9f7;border-radius:var(--radius-sm);padding:12px;margin-top:8px;font-size:12px;line-height:1.7;color:var(--text)}
+
+@media(max-width:480px){
+  .form-row.c3{grid-template-columns:1fr 1fr}
+  .result-grid{grid-template-columns:repeat(2,1fr)}
+  .nav-brand{font-size:13px;padding:0 10px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">Med<span>Nutrition</span></div>
+    <div class="nav-tabs">
+      <div class="nav-tab on" onclick="showPage('calc')">🧮 คำนวณ</div>
+      <div class="nav-tab" onclick="showPage('admin')">⚙️ จัดการข้อมูล</div>
+      <div class="nav-tab" onclick="showPage('guide')">📱 ติดตั้ง</div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ PAGE: CALCULATOR ============ -->
+<div class="page on" id="page-calc">
+
+  <!-- Product Select -->
+  <div class="card">
+    <div class="card-head"><span class="card-title">เลือกผลิตภัณฑ์</span></div>
+    <div class="card-body" id="brand-sections"></div>
+  </div>
+
+  <!-- Product Info -->
+  <div id="sv-box" class="sv-box">
+    <div class="sv-title">📋 Standard Serving ตามฉลาก</div>
+    <div class="sv-row" id="sv-row"></div>
+  </div>
+  <div id="info-box" class="info-box"></div>
+
+  <!-- Concentration -->
+  <div class="card">
+    <div class="card-head"><span class="card-title">ความเข้มข้นที่แพทย์สั่ง</span></div>
+    <div class="card-body">
+      <div class="conc-panel">
+        <div class="conc-row">
+          <span style="font-size:12px;color:var(--text2)">ความเข้มข้น:</span>
+          <input type="number" class="conc-input" id="conc" value="1.0" min="0.3" max="3.0" step="0.1" oninput="syncPreset();calc()">
+          <span style="font-size:12px;color:var(--text2)">kcal/ml</span>
+          <div class="preset-chips">
+            <div class="preset" onclick="setConc(0.5)">0.5</div>
+            <div class="preset on" onclick="setConc(1.0)">1.0</div>
+            <div class="preset" onclick="setConc(1.2)">1.2</div>
+            <div class="preset" onclick="setConc(1.5)">1.5</div>
+            <div class="preset" onclick="setConc(2.0)">2.0</div>
+            <div class="preset" onclick="setConc(2.5)">2.5</div>
+          </div>
+        </div>
+        <div class="conc-hint" id="conc-hint">—</div>
+      </div>
+
+      <!-- Patient Requirements -->
+      <div class="form-row c3">
+        <div class="fg">
+          <label>พลังงาน (kcal/วัน)</label>
+          <input type="number" id="req-kcal" class="big" value="1500" min="200" max="4000" step="50" oninput="calc()">
+        </div>
+        <div class="fg">
+          <label>โปรตีน (g/วัน) 0=ไม่ระบุ</label>
+          <input type="number" id="req-prot" value="60" min="0" max="300" step="5" oninput="calc()">
+        </div>
+        <div class="fg">
+          <label>จำนวนมื้อ/วัน</label>
+          <input type="number" id="req-meals" value="4" min="1" max="12" oninput="calc()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="card" id="result-card" style="display:none">
+    <div class="card-head"><span class="card-title">ผลการคำนวณ</span></div>
+    <div class="card-body">
+      <div class="prog-row">
+        <div class="prog-box">
+          <div class="prog-label">พลังงาน/วัน</div>
+          <div class="prog-val" id="bkv">—</div>
+          <div class="prog-bar"><div class="prog-fill" id="bkf" style="width:0%"></div></div>
+        </div>
+        <div class="prog-box">
+          <div class="prog-label">โปรตีน/วัน</div>
+          <div class="prog-val" id="bpv">—</div>
+          <div class="prog-bar"><div class="prog-fill" id="bpf" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div class="result-grid" id="cards"></div>
+      <hr style="border:none;border-top:1px solid var(--border);margin:10px 0">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:6px">ตารางสารอาหาร</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>สารอาหาร</th><th>ต่อมื้อ</th><th>ต่อวัน</th><th>เป้าหมาย</th><th>%</th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="warnbox" id="warn"></div>
+      <div class="notebox" id="note"></div>
+    </div>
+  </div>
+
+  <div class="card" id="no-product-card">
+    <div class="empty">
+      <div class="empty-icon">💊</div>
+      <div class="empty-text">เลือกผลิตภัณฑ์ด้านบนเพื่อเริ่มคำนวณ</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAGE: ADMIN ============ -->
+<div class="page" id="page-admin">
+  <div class="card">
+    <div class="card-head" style="justify-content:space-between">
+      <span class="card-title">จัดการผลิตภัณฑ์</span>
+      <button class="btn btn-primary btn-sm" onclick="openModal()">+ เพิ่มผลิตภัณฑ์</button>
+    </div>
+    <div class="card-body">
+      <div class="admin-tabs" id="admin-filter-tabs"></div>
+      <div class="product-list" id="product-list"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="card-title">จัดการข้อมูล</span></div>
+    <div class="card-body">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn btn-outline btn-block" onclick="exportData()">📥 ส่งออกข้อมูล (JSON)</button>
+        <label class="btn btn-outline btn-block" style="cursor:pointer">
+          📤 นำเข้าข้อมูล (JSON)
+          <input type="file" accept=".json" style="display:none" onchange="importData(this)">
+        </label>
+        <button class="btn btn-sm" style="background:#fff3e0;color:var(--warning);border:1.5px solid var(--warning)" onclick="resetToDefault()">🔄 รีเซ็ตเป็นข้อมูลเริ่มต้น</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAGE: GUIDE ============ -->
+<div class="page" id="page-guide">
+  <div class="card">
+    <div class="card-head"><span class="card-title">📱 ติดตั้งบนมือถือ / Tablet</span></div>
+    <div class="card-body">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:16px">แอปนี้เป็น PWA (Progressive Web App) ติดตั้งได้โดยไม่ต้องผ่าน App Store</p>
+
+      <div style="margin-bottom:20px">
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <span class="badge badge-blue">🍎 iPhone / iPad</span>
+        </div>
+        <div class="guide-step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">เปิดใน Safari</div>
+            <div class="step-desc">ต้องใช้ Safari เท่านั้น (Chrome บน iOS ไม่รองรับ)</div>
+          </div>
+        </div>
+        <div class="guide-step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">กดปุ่ม Share (กล่องลูกศรขึ้น)</div>
+            <div class="step-desc">อยู่ที่ด้านล่างของหน้าจอ iPhone หรือด้านบนบน iPad</div>
+          </div>
+        </div>
+        <div class="guide-step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">เลือก "Add to Home Screen"</div>
+            <div class="step-desc">เลื่อนลงในเมนู แล้วกด "Add to Home Screen" หรือ "เพิ่มในหน้าจอหลัก"</div>
+          </div>
+        </div>
+        <div class="guide-step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">กด Add / เพิ่ม</div>
+            <div class="step-desc">แอปจะปรากฏบน Home Screen เหมือน App ทั่วไป</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <span class="badge badge-green">🤖 Android</span>
+        </div>
+        <div class="guide-step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">เปิดใน Chrome</div>
+            <div class="step-desc">ใช้ Google Chrome บน Android</div>
+          </div>
+        </div>
+        <div class="guide-step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">กด ⋮ เมนู (3 จุด)</div>
+            <div class="step-desc">มุมขวาบนของเบราว์เซอร์</div>
+          </div>
+        </div>
+        <div class="guide-step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">เลือก "Add to Home screen"</div>
+            <div class="step-desc">หรืออาจมี Popup ถามอัตโนมัติ "Install app?"</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="highlight-box">
+        <strong>💡 วิธี Host แอปนี้ฟรีบน GitHub Pages</strong><br><br>
+        1. สมัคร GitHub ที่ <strong>github.com</strong> (ฟรี)<br>
+        2. สร้าง Repository ใหม่ชื่ออะไรก็ได้<br>
+        3. อัปโหลดไฟล์ <strong>index.html</strong> ขึ้นไป<br>
+        4. ไปที่ Settings → Pages → เปิด GitHub Pages<br>
+        5. ได้ URL เช่น <strong>yourname.github.io/nutrition</strong><br>
+        6. แชร์ URL นี้ให้ทีมใช้งานได้เลย<br><br>
+        <strong>อัปเดตข้อมูล:</strong> แก้ไขไฟล์ใน GitHub → ทุกอุปกรณ์อัปเดตอัตโนมัติ
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Add/Edit Product -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title" id="modal-title">เพิ่มผลิตภัณฑ์</span>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-id">
+      <div class="section-divider">ข้อมูลทั่วไป</div>
+      <div class="form-group">
+        <label>ชื่อผลิตภัณฑ์ *</label>
+        <input type="text" id="f-name" placeholder="เช่น Ensure Original">
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label>แบรนด์</label>
+          <select id="f-brand">
+            <option value="blue">🔵 Abbott</option>
+            <option value="green">🟢 Nestlé</option>
+            <option value="amber">🟠 Fresenius</option>
+            <option value="red">🔴 Thai Otsuka</option>
+            <option value="purple">🟣 Mega We Care</option>
+            <option value="gray">⚪ อื่นๆ</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>กลุ่ม</label>
+          <select id="f-group">
+            <option value="g1">Abbott — ผงชง</option>
+            <option value="g2">Abbott — RTD/Tube</option>
+            <option value="g3">Nestlé — ผงชง</option>
+            <option value="g4">Nestlé — Tube RTD</option>
+            <option value="g5">Fresenius — ผงชง</option>
+            <option value="g6">Thai Otsuka</option>
+            <option value="g7">Mega We Care</option>
+            <option value="g8">อื่นๆ</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label>ชนิด</label>
+          <select id="f-type">
+            <option value="pwd">ผงชง (Powder)</option>
+            <option value="liq">ชนิดน้ำ / RTD / Tube</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>ความเข้มข้นมาตรฐาน (kcal/ml)</label>
+          <input type="number" id="f-stdconc" value="1.0" step="0.01" min="0.1" max="3">
+        </div>
+      </div>
+
+      <div class="section-divider">ข้อมูลต่อ 1 Serving (ผง) หรือต่อ 100ml (น้ำ)</div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label>ช้อนตวง / serving</label>
+          <input type="number" id="f-sc" value="0" step="0.5" min="0" placeholder="0 = ไม่มีช้อน/ใช้ซอง">
+        </div>
+        <div class="form-group">
+          <label>กรัมผง / serving (g)</label>
+          <input type="number" id="f-g" value="0" step="0.1" min="0">
+        </div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label>ปริมาตรสุดท้าย (ml) — ผงชง</label>
+          <input type="number" id="f-vol" value="0" step="1" min="0" placeholder="0 = ไม่ระบุ">
+        </div>
+        <div class="form-group">
+          <label>พลังงาน (kcal)</label>
+          <input type="number" id="f-kcal" value="0" step="0.1" min="0">
+        </div>
+      </div>
+
+      <div class="section-divider">สารอาหาร (ต่อ serving หรือต่อ 100ml)</div>
+      <div class="form-row-2">
+        <div class="form-group"><label>โปรตีน (g)</label><input type="number" id="f-prot" value="0" step="0.1" min="0"></div>
+        <div class="form-group"><label>คาร์โบไฮเดรต (g)</label><input type="number" id="f-cho" value="0" step="0.1" min="0"></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group"><label>ไขมัน (g)</label><input type="number" id="f-fat" value="0" step="0.1" min="0"></div>
+        <div class="form-group"><label>ใยอาหาร (g)</label><input type="number" id="f-fb" value="0" step="0.1" min="0"></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group"><label>โซเดียม (mg)</label><input type="number" id="f-na" value="0" step="1" min="0"></div>
+        <div class="form-group"><label>โพแทสเซียม (mg)</label><input type="number" id="f-k" value="0" step="1" min="0"></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group"><label>ฟอสฟอรัส (mg)</label><input type="number" id="f-ph" value="0" step="1" min="0"></div>
+      </div>
+
+      <div class="section-divider">ข้อมูลเพิ่มเติม</div>
+      <div class="form-group">
+        <label>ข้อบ่งใช้ / เหมาะสำหรับ</label>
+        <textarea id="f-indic" placeholder="เช่น เบาหวาน Low GI โรคไต..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>วิธีผสม / หมายเหตุ</label>
+        <textarea id="f-note" placeholder="เช่น 6ช้อน(55g)+น้ำ200ml=250ml | 1ช้อน=8g"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn btn-success" onclick="saveProduct()">💾 บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ DEFAULT DATA ============
+const DEFAULT_PRODUCTS = [
+  {id:'ensure',n:'Ensure Original',gr:'g1',br:'blue',t:'pwd',sc:6,g:53.8,vol:230,kcal:228,prot:8.6,cho:30.7,fat:7.5,fb:0,na:204,k:398,ph:226,std_conc:1.0,indic:'ทั่วไป ทุพโภชนาการ',note:'6ช้อน(53.8g)+น้ำ~176ml=230ml | 1ช้อน=8.97g'},
+  {id:'ensure_plus',n:'Ensure Plus',gr:'g1',br:'blue',t:'pwd',sc:6,g:60,vol:230,kcal:345,prot:12.4,cho:47.3,fat:12.4,fb:0,na:306,k:598,ph:336,std_conc:1.5,indic:'พลังงานสูง จำกัดน้ำ',note:'6ช้อน(60g)+น้ำ~170ml=230ml | 1ช้อน=10g'},
+  {id:'ensure_gold',n:'Ensure Gold',gr:'g1',br:'blue',t:'pwd',sc:6,g:60.6,vol:230,kcal:267,prot:10.9,cho:34.6,fat:9.7,fb:1.2,na:188,k:455,ph:261,std_conc:1.16,indic:'ผู้สูงอายุ CaHMB',note:'6ช้อน(60.6g)+น้ำ185ml=230ml | 1ช้อน=19.8g'},
+  {id:'glucerna',n:'Glucerna SR',gr:'g1',br:'blue',t:'pwd',sc:5,g:52.1,vol:237,kcal:203,prot:9.4,cho:18.8,fat:10.4,fb:4.2,na:151,k:386,ph:208,std_conc:0.86,indic:'เบาหวาน Low GI=34',note:'5ช้อน(52.1g)+น้ำ~200ml=237ml | 1ช้อน=17.4g'},
+  {id:'prosure_pwd',n:'Prosure (ผง)',gr:'g1',br:'blue',t:'pwd',sc:9,g:75,vol:240,kcal:304,prot:12.5,cho:39.4,fat:10.4,fb:1.5,na:210,k:473,ph:263,std_conc:1.27,indic:'มะเร็ง EPA 1.1g/serving',note:'9ช้อน(75g)+น้ำ185ml=240ml | 1ช้อน=8.33g'},
+  {id:'nepro_lp',n:'Nepro LP',gr:'g2',br:'blue',t:'liq',sc:0,g:0,vol:0,kcal:182,prot:4.5,cho:25.5,fat:8.2,fb:0.9,na:52,k:55,ph:41,std_conc:1.82,indic:'CKD Pre-dialysis GI=44',note:'RTD 220ml=401kcal'},
+  {id:'nepro_hp',n:'Nepro HP',gr:'g2',br:'blue',t:'liq',sc:0,g:0,vol:0,kcal:182,prot:8.1,cho:24.1,fat:8.2,fb:0.9,na:52,k:55,ph:41,std_conc:1.82,indic:'CKD Hemodialysis GI=35',note:'RTD 220ml=401kcal'},
+  {id:'jevity_1',n:'Jevity 1 Cal',gr:'g2',br:'blue',t:'liq',sc:0,g:0,vol:0,kcal:106,prot:4.4,cho:14.4,fat:3.4,fb:1.4,na:95,k:156,ph:95,std_conc:1.06,indic:'สายยาง isotonic มีใยอาหาร',note:'1.06kcal/ml'},
+  {id:'jevity_15',n:'Jevity 1.5 Cal',gr:'g2',br:'blue',t:'liq',sc:0,g:0,vol:0,kcal:150,prot:6.4,cho:20.1,fat:4.9,fb:2.1,na:143,k:234,ph:143,std_conc:1.5,indic:'สายยาง high-cal มีใยอาหาร',note:'1.5kcal/ml'},
+  {id:'osmolite_1',n:'Osmolite 1 Cal',gr:'g2',br:'blue',t:'liq',sc:0,g:0,vol:0,kcal:106,prot:4.4,cho:14.4,fat:3.4,fb:0,na:95,k:156,ph:95,std_conc:1.06,indic:'สายยาง isotonic ไม่มีใยอาหาร',note:'1.06kcal/ml'},
+  {id:'osmolite_15',n:'Osmolite 1.5 Cal',gr:'g2',br:'blue',t:'liq',sc:0,g:0,vol:0,kcal:150,prot:6.3,cho:20.3,fat:4.9,fb:0,na:143,k:200,ph:143,std_conc:1.5,indic:'สายยาง high-cal ไม่มีใยอาหาร',note:'1.5kcal/ml'},
+  {id:'vital_15',n:'Vital 1.5 Cal',gr:'g2',br:'blue',t:'liq',sc:0,g:0,vol:0,kcal:150,prot:6.75,cho:19.0,fat:4.9,fb:0,na:140,k:200,ph:120,std_conc:1.5,indic:'GI impaired Peptide MCT50%',note:'1.5kcal/ml'},
+  {id:'boost_opt',n:'Boost Optimum',gr:'g3',br:'green',t:'pwd',sc:7,g:55,vol:245,kcal:244,prot:10.1,cho:29.1,fat:10.0,fb:2.6,na:161,k:373,ph:228,std_conc:1.0,indic:'ทั่วไป ผู้สูงอายุ Whey+Probiotics',note:'7ช้อน(55g)+น้ำ190ml=245ml | 1ช้อน=7.86g'},
+  {id:'boost_gc',n:'Boost Glucose Control',gr:'g3',br:'green',t:'pwd',sc:8,g:55,vol:250,kcal:220,prot:10.5,cho:20.4,fat:10.0,fb:3.5,na:155,k:355,ph:220,std_conc:0.88,indic:'เบาหวาน Low GI=37',note:'8ช้อน(55g)+น้ำ210ml=250ml | 1ช้อน=6.875g'},
+  {id:'boost_fib',n:'Boost Fiber',gr:'g3',br:'green',t:'pwd',sc:7,g:58,vol:250,kcal:250,prot:10.0,cho:32.5,fat:9.3,fb:3.8,na:200,k:400,ph:250,std_conc:1.0,indic:'ทั่วไป ท้องผูก มีใยอาหาร',note:'7ช้อน(58g)+น้ำ210ml=250ml | 1ช้อน=8.29g'},
+  {id:'oral_impact',n:'Oral Impact',gr:'g3',br:'green',t:'pwd',sc:0,g:74,vol:250,kcal:303,prot:16.5,cho:43.3,fat:7.4,fb:3.0,na:250,k:350,ph:200,std_conc:1.21,indic:'มะเร็ง ก่อน-หลังผ่าตัด Arg+Omega3',note:'1ซอง(74g)+น้ำเย็น250ml'},
+  {id:'nutren_jr',n:'Nutren Junior',gr:'g3',br:'green',t:'pwd',sc:7,g:55,vol:250,kcal:250,prot:9.5,cho:31.0,fat:9.6,fb:3.5,na:170,k:350,ph:220,std_conc:1.0,indic:'เด็ก 1ปีขึ้นไป DHA Probiotics',note:'7ช้อน(55g)+น้ำ210ml=250ml | 1ช้อน=7.86g'},
+  {id:'beneprotein',n:'Boost Beneprotein',gr:'g3',br:'green',t:'pwd',sc:1,g:7,vol:120,kcal:25,prot:6.0,cho:0,fat:0.1,fb:0,na:30,k:70,ph:0,std_conc:0.21,indic:'เสริมโปรตีน Whey Isolate 98.5%',note:'1ช้อน(7g)+เครื่องดื่ม120ml'},
+  {id:'optifast',n:'Optifast',gr:'g3',br:'green',t:'pwd',sc:0,g:53,vol:200,kcal:200,prot:20.0,cho:20.0,fat:5.0,fb:5.0,na:300,k:500,ph:400,std_conc:1.0,indic:'VLCD BMI>30 แทนมื้ออาหาร',note:'1ซอง(53g)+น้ำ200ml'},
+  {id:'nutren_10',n:'Nutren 1.0',gr:'g4',br:'green',t:'liq',sc:0,g:0,vol:0,kcal:100,prot:4.0,cho:12.7,fat:3.8,fb:0,na:95,k:148,ph:95,std_conc:1.0,indic:'สายยางมาตรฐาน',note:'1.0kcal/ml'},
+  {id:'nutren_15',n:'Nutren 1.5',gr:'g4',br:'green',t:'liq',sc:0,g:0,vol:0,kcal:150,prot:6.0,cho:16.8,fat:6.8,fb:0,na:143,k:220,ph:143,std_conc:1.5,indic:'สายยาง high-cal',note:'1.5kcal/ml'},
+  {id:'nutren_20',n:'Nutren 2.0',gr:'g4',br:'green',t:'liq',sc:0,g:0,vol:0,kcal:200,prot:8.0,cho:21.9,fat:9.0,fb:0,na:185,k:285,ph:185,std_conc:2.0,indic:'สายยาง very high-cal',note:'2.0kcal/ml'},
+  {id:'isocal',n:'Isocal',gr:'g4',br:'green',t:'liq',sc:0,g:0,vol:0,kcal:100,prot:3.4,cho:13.5,fat:3.6,fb:0,na:87,k:125,ph:87,std_conc:1.0,indic:'สายยาง isotonic',note:'1.0kcal/ml'},
+  {id:'peptamen',n:'Peptamen',gr:'g4',br:'green',t:'liq',sc:0,g:0,vol:0,kcal:100,prot:4.0,cho:12.7,fat:3.7,fb:0,na:100,k:160,ph:100,std_conc:1.0,indic:'GI impaired Pancreatitis',note:'MCT70% isotonic'},
+  {id:'peptamen_15',n:'Peptamen 1.5',gr:'g4',br:'green',t:'liq',sc:0,g:0,vol:0,kcal:150,prot:6.8,cho:18.2,fat:5.8,fb:0,na:150,k:200,ph:130,std_conc:1.5,indic:'GI impaired high-cal',note:'1.5kcal/ml MCT70%'},
+  {id:'fresubin_f',n:'Fresubin Powder Fibre',gr:'g5',br:'amber',t:'pwd',sc:4.5,g:69,vol:200,kcal:290,prot:12.4,cho:39.3,fat:9.7,fb:4.1,na:207,k:400,ph:242,std_conc:1.5,indic:'ทั่วไป ท้องผูก มีใยอาหาร',note:'4.5ช้อน(69g)+น้ำ140ml=200ml | 1ช้อน=15.3g'},
+  {id:'fresubin_e',n:'Fresubin Powder Extra',gr:'g5',br:'amber',t:'pwd',sc:0,g:62,vol:260,kcal:400,prot:16.7,cho:57,fat:12,fb:0,na:204,k:480,ph:308,std_conc:1.54,indic:'ทุพโภชนาการ พลังงานสูง ผสมนม',note:'1ซอง(62g)+นม200ml'},
+  {id:'fresubin_p',n:'Fresubin Protein Powder',gr:'g5',br:'amber',t:'pwd',sc:1,g:6,vol:0,kcal:21.6,prot:5.22,cho:0,fat:0.12,fb:0,na:33,k:72,ph:14,std_conc:0,indic:'เสริมโปรตีน 100% Whey isolate',note:'1ช้อน=6g ผสมอาหาร/เครื่องดื่มใดก็ได้'},
+  {id:'once_complete',n:'ONCE Complete',gr:'g6',br:'red',t:'pwd',sc:7,g:56,vol:240,kcal:237,prot:10.7,cho:27.9,fat:9.2,fb:2.2,na:185,k:350,ph:220,std_conc:1.0,indic:'ทั่วไป ทุพโภชนาการ Lactose-free',note:'7ช้อน(56g)+น้ำ180ml=240ml | 1ช้อน=8g'},
+  {id:'once_pro',n:'ONCE PRO',gr:'g6',br:'red',t:'pwd',sc:6,g:48,vol:200,kcal:204,prot:10.2,cho:20.4,fat:9.0,fb:3.2,na:180,k:330,ph:200,std_conc:1.0,indic:'เบาหวาน Low GI=27',note:'6ช้อน(48g)+น้ำ160ml=200ml | 1ช้อน=8g'},
+  {id:'once_renal',n:'ONCE Renal',gr:'g6',br:'red',t:'pwd',sc:5,g:76,vol:200,kcal:360,prot:7.2,cho:46.8,fat:17.2,fb:3.8,na:80,k:80,ph:50,std_conc:1.8,indic:'CKD Pre-dialysis โปรตีนต่ำ',note:'5ช้อน(76g)+น้ำ124ml=200ml | 1ช้อน=15.2g'},
+  {id:'once_dialyze',n:'ONCE Dialyze',gr:'g6',br:'red',t:'pwd',sc:5,g:80,vol:250,kcal:370,prot:16.6,cho:38.8,fat:18.4,fb:4.0,na:100,k:100,ph:70,std_conc:1.48,indic:'CKD Hemodialysis',note:'5ช้อน(80g)+น้ำ190ml=250ml | 1ช้อน=16g'},
+  {id:'once_sarco',n:'ONCE Sarcopenia',gr:'g6',br:'red',t:'pwd',sc:10,g:73,vol:250,kcal:300,prot:17.25,cho:30,fat:12.3,fb:2.0,na:200,k:380,ph:240,std_conc:1.2,indic:'Sarcopenia ผู้สูงอายุ Leucine 3g',note:'10ช้อน(73g)+น้ำ180ml=250ml | 1ช้อน=7.3g'},
+  {id:'aminoleban',n:'AMINOLEBAN-ORAL',gr:'g6',br:'red',t:'pwd',sc:5,g:50,vol:200,kcal:210,prot:13.5,cho:28.5,fat:5.5,fb:0,na:120,k:140,ph:100,std_conc:1.05,indic:'โรคตับ ตับแข็ง BCAA สูง',note:'5ช้อน(50g)+น้ำอุ่น180ml=200ml | 1ช้อน=10g'},
+  {id:'neo_mune',n:'NEO-MUNE',gr:'g6',br:'red',t:'pwd',sc:7,g:60,vol:250,kcal:254,prot:15.6,cho:30.5,fat:8.5,fb:0,na:200,k:280,ph:180,std_conc:1.0,indic:'มะเร็ง ICU Gln+Arg+Omega3',note:'7ช้อน(60g)+น้ำ250ml | 1ช้อน=8.5g'},
+  {id:'blendera',n:'BLENDERA-MF',gr:'g6',br:'red',t:'pwd',sc:6,g:50,vol:225,kcal:225,prot:9.5,cho:29.5,fat:8.0,fb:2.5,na:165,k:310,ph:190,std_conc:1.0,indic:'ทั่วไป สายยาง Soy+MCT+FOS',note:'6ช้อน(50g)+น้ำ185ml=225ml | 1ช้อน=8.33g'},
+  {id:'immuplex',n:'Immuplex',gr:'g7',br:'purple',t:'pwd',sc:1,g:11,vol:250,kcal:39.6,prot:9.0,cho:0.22,fat:0.11,fb:0,na:5.5,k:11,ph:0,std_conc:0.16,indic:'เสริมภูมิ Whey isolate 90% Se+Zn',note:'1ช้อน(11g)+น้ำ250ml | 1-3ช้อน/วัน'},
+  {id:'glucomeal',n:'Glucomeal',gr:'g7',br:'purple',t:'pwd',sc:2,g:50,vol:200,kcal:190,prot:9.0,cho:20.0,fat:7.5,fb:3.0,na:75,k:200,ph:100,std_conc:0.95,indic:'เบาหวาน Low GI Probiotics Inulin',note:'2ช้อน(50g)+น้ำ200ml | 1-3ครั้ง/วัน'},
+];
+
+const GRP_LABELS = {
+  g1:'Abbott — ผงชง',g2:'Abbott — RTD/Tube',
+  g3:'Nestlé — ผงชง',g4:'Nestlé — Tube RTD',
+  g5:'Fresenius — ผงชง',g6:'Thai Otsuka',
+  g7:'Mega We Care',g8:'อื่นๆ'
+};
+const PRESETS_VAL = [0.5,1.0,1.2,1.5,2.0,2.5];
+
+// ============ STATE ============
+let products = [];
+let cur = null;
+let adminFilter = 'all';
+
+function loadProducts(){
+  const saved = localStorage.getItem('med_products');
+  products = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+}
+function saveProducts(){
+  localStorage.setItem('med_products', JSON.stringify(products));
+}
+function getP(id){ return products.find(p=>p.id===id); }
+
+// ============ NAV ============
+function showPage(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('on'));
+  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('on'));
+  document.getElementById('page-'+p).classList.add('on');
+  event.currentTarget.classList.add('on');
+  if(p==='admin') renderAdmin();
+}
+
+// ============ BUILD CALC UI ============
+function buildBrandSections(){
+  const container = document.getElementById('brand-sections');
+  container.innerHTML='';
+  const groups = {};
+  products.forEach(p=>{
+    if(!groups[p.gr]) groups[p.gr]=[];
+    groups[p.gr].push(p);
+  });
+  Object.entries(groups).forEach(([gr,prods])=>{
+    const section = document.createElement('div');
+    section.className='brand-section';
+    const label = document.createElement('div');
+    label.className='brand-label';
+    label.textContent=GRP_LABELS[gr]||gr;
+    section.appendChild(label);
+    const chips = document.createElement('div');
+    chips.className='chips';
+    prods.forEach(p=>{
+      const chip = document.createElement('div');
+      chip.className='chip';
+      chip.id='chip-'+p.id;
+      chip.textContent=p.n;
+      chip.onclick=()=>selProduct(p.id);
+      chips.appendChild(chip);
+    });
+    section.appendChild(chips);
+    container.appendChild(section);
+  });
+}
+
+function selProduct(id){
+  cur=id;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on-blue','on-green','on-amber','on-red','on-purple'));
+  const p=getP(id); if(!p) return;
+  const chip=document.getElementById('chip-'+id);
+  if(chip) chip.classList.add('on-'+p.br);
+  // Serving box
+  const svBox=document.getElementById('sv-box');
+  const svRow=document.getElementById('sv-row');
+  svBox.className='sv-box '+(p.br||'blue');
+  if(p.t==='pwd'&&p.g>0){
+    svBox.style.display='block';
+    svRow.innerHTML=`
+      <div class="sv-item">ช้อน/serving: <b>${p.sc>0?p.sc:'1ซอง'}</b></div>
+      <div class="sv-item">ผง: <b>${p.g}g</b></div>
+      ${p.vol>0?`<div class="sv-item">ปริมาตร: <b>${p.vol}ml</b></div>`:''}
+      <div class="sv-item">พลังงาน: <b>${p.kcal}kcal</b></div>
+      <div class="sv-item">โปรตีน: <b>${p.prot}g</b></div>
+      ${p.sc>0?`<div class="sv-item">g/ช้อน: <b>${(p.g/p.sc).toFixed(2)}g</b></div>`:''}
+    `;
+  } else { svBox.style.display='none'; }
+  // Info box
+  const ib=document.getElementById('info-box');
+  if(p.indic||p.note){
+    ib.style.display='block';
+    ib.innerHTML=`<b>สำหรับ:</b> ${p.indic||'—'}<br><b>วิธีผสม:</b> ${p.note||'—'}`;
+  } else ib.style.display='none';
+  // Auto set conc
+  if(p.std_conc>0){
+    document.getElementById('conc').value=p.std_conc;
+    syncPreset();
+  }
+  document.getElementById('result-card').style.display='block';
+  document.getElementById('no-product-card').style.display='none';
+  calc();
+}
+
+// ============ CONCENTRATION ============
+function setConc(v){
+  document.getElementById('conc').value=v;
+  syncPreset(); calc();
+}
+function syncPreset(){
+  const v=parseFloat(document.getElementById('conc').value)||1.0;
+  document.querySelectorAll('.preset').forEach((btn,i)=>{
+    btn.classList.toggle('on',Math.abs(PRESETS_VAL[i]-v)<0.001);
+  });
+}
+
+// ============ CALC ============
+function f(v,d=1){return(isNaN(v)||!isFinite(v))?'—':parseFloat(v.toFixed(d)).toLocaleString('th-TH');}
+function pct(g,t){if(!t||t<=0)return'—';return Math.round(g/t*100)+'%';}
+function fp(g,t){if(!t||t<=0)return 0;return Math.min(100,Math.round(g/t*100));}
+
+function calc(){
+  if(!cur) return;
+  const p=getP(cur); if(!p) return;
+  const reqK=+document.getElementById('req-kcal').value||1500;
+  const reqP=+document.getElementById('req-prot').value||0;
+  const meals=+document.getElementById('req-meals').value||4;
+  const userConc=parseFloat(document.getElementById('conc').value)||1.0;
+  const cards=document.getElementById('cards');
+  const tbody=document.getElementById('tbody');
+
+  let warnText='', noteText='';
+
+  if(p.t==='pwd'){
+    const kcalPerG=p.kcal/p.g;
+    const gPerMl=userConc/kcalPerG;
+    const mlPerDay=reqK/userConc;
+    const mlPerMeal=mlPerDay/meals;
+    const gPerMeal=gPerMl*mlPerMeal;
+    const gPerDay=gPerMl*mlPerDay;
+    const scPerMeal=p.sc>0?gPerMeal/(p.g/p.sc):0;
+    const scPerDay=p.sc>0?gPerDay/(p.g/p.sc):0;
+    const waterPerMeal=Math.max(mlPerMeal-gPerMeal*0.72,0);
+    const ratioD=gPerDay/p.g, ratioM=gPerMeal/p.g;
+    const gotD={kcal:p.kcal*ratioD,prot:p.prot*ratioD,cho:p.cho*ratioD,fat:p.fat*ratioD,fb:(p.fb||0)*ratioD,na:(p.na||0)*ratioD,k:(p.k||0)*ratioD,ph:(p.ph||0)*ratioD};
+    const gotM={kcal:p.kcal*ratioM,prot:p.prot*ratioM,cho:p.cho*ratioM,fat:p.fat*ratioM,fb:(p.fb||0)*ratioM,na:(p.na||0)*ratioM,k:(p.k||0)*ratioM,ph:(p.ph||0)*ratioM};
+
+    const scR=p.sc>0?Math.round(scPerMeal*2)/2:0;
+    const gR=scR>0&&p.sc>0?scR*(p.g/p.sc):gPerMeal;
+    const kcalR=gR*kcalPerG;
+
+    document.getElementById('conc-hint').textContent=`ความเข้มข้น ${userConc} kcal/ml → ใช้ผง ${f(gPerMl,3)} g/ml | มาตรฐาน: ${p.std_conc} kcal/ml`;
+
+    // Progress
+    const kp=fp(gotD.kcal,reqK);
+    document.getElementById('bkv').textContent=`${f(gotD.kcal,0)} / ${reqK} kcal`;
+    const kf=document.getElementById('bkf'); kf.style.width=kp+'%'; kf.className='prog-fill'+(kp>=95&&kp<=105?' ok':kp>110?' warn':'');
+    if(reqP>0){const pp=fp(gotD.prot,reqP);document.getElementById('bpv').textContent=`${f(gotD.prot,1)} / ${reqP} g`;const pf=document.getElementById('bpf');pf.style.width=pp+'%';pf.className='prog-fill'+(pp>=85?' ok':' warn');}
+    else{document.getElementById('bpv').textContent=`${f(gotD.prot,1)} g`;document.getElementById('bpf').style.width='0%';}
+
+    cards.innerHTML=`
+      <div style="grid-column:1/-1;background:#e8f4fd;border:1.5px solid #90caf9;border-radius:10px;padding:12px 14px;margin-bottom:2px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#1565c0;margin-bottom:8px">📋 ต่อมื้อ (${meals} มื้อ/วัน)</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px">
+          <div><div style="font-size:10px;color:#5a6a7e">ผงที่ใช้</div><div style="font-size:18px;font-weight:700;color:#0f4c75">${f(gPerMeal,1)}</div><div style="font-size:10px;color:#5a6a7e">g/มื้อ</div></div>
+          <div><div style="font-size:10px;color:#5a6a7e">${p.sc>0?'ช้อนตวง (แม่นยำ)':'ซอง/มื้อ'}</div><div style="font-size:18px;font-weight:700;color:#0f4c75">${p.sc>0?f(scPerMeal,2):f(mlPerMeal/(p.vol||250),2)}</div><div style="font-size:10px;color:#5a6a7e">${p.sc>0?'ช้อน':'ซอง'}</div></div>
+          ${p.sc>0?`<div><div style="font-size:10px;color:#e65100;font-weight:600">ปัดเป็น</div><div style="font-size:18px;font-weight:700;color:#e65100">${f(scR,1)}</div><div style="font-size:10px;color:#e65100">ช้อน (${f(gR,0)}g)</div></div>`:''}
+          <div><div style="font-size:10px;color:#5a6a7e">น้ำที่เติม</div><div style="font-size:18px;font-weight:700;color:#0f4c75">${f(waterPerMeal,0)}</div><div style="font-size:10px;color:#5a6a7e">ml/มื้อ</div></div>
+          <div><div style="font-size:10px;color:#5a6a7e">ปริมาตรสุดท้าย</div><div style="font-size:18px;font-weight:700;color:#0f4c75">${f(mlPerMeal,0)}</div><div style="font-size:10px;color:#5a6a7e">ml/มื้อ</div></div>
+          <div><div style="font-size:10px;color:#5a6a7e">พลังงาน</div><div style="font-size:18px;font-weight:700;color:#0f4c75">${f(gotM.kcal,0)}</div><div style="font-size:10px;color:#5a6a7e">kcal/มื้อ</div></div>
+          <div><div style="font-size:10px;color:#5a6a7e">โปรตีน</div><div style="font-size:18px;font-weight:700;color:#0f4c75">${f(gotM.prot,1)}</div><div style="font-size:10px;color:#5a6a7e">g/มื้อ</div></div>
+        </div>
+      </div>
+      <div style="grid-column:1/-1;background:#e8f5e9;border:1.5px solid #a5d6a7;border-radius:10px;padding:12px 14px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#1b5e20;margin-bottom:8px">📊 รวมทั้งวัน</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px">
+          <div><div style="font-size:10px;color:#5a6a7e">ผงรวม</div><div style="font-size:18px;font-weight:700;color:#1b5e20">${f(gPerDay,1)}</div><div style="font-size:10px;color:#5a6a7e">g/วัน</div></div>
+          <div><div style="font-size:10px;color:#5a6a7e">${p.sc>0?'ช้อนรวม':'ซองรวม'}</div><div style="font-size:18px;font-weight:700;color:#1b5e20">${p.sc>0?f(scPerDay,1):f(mlPerDay/(p.vol||250),1)}</div><div style="font-size:10px;color:#5a6a7e">${p.sc>0?'ช้อน/วัน':'ซอง/วัน'}</div></div>
+          <div><div style="font-size:10px;color:#5a6a7e">น้ำรวม</div><div style="font-size:18px;font-weight:700;color:#1b5e20">${f(waterPerMeal*meals,0)}</div><div style="font-size:10px;color:#5a6a7e">ml/วัน</div></div>
+          <div><div style="font-size:10px;color:#5a6a7e">ปริมาตรรวม</div><div style="font-size:18px;font-weight:700;color:#1b5e20">${f(mlPerDay,0)}</div><div style="font-size:10px;color:#5a6a7e">ml/วัน</div></div>
+          <div><div style="font-size:10px;color:#5a6a7e">พลังงานรวม</div><div style="font-size:18px;font-weight:700;color:#1b5e20">${f(gotD.kcal,0)}</div><div style="font-size:10px;color:#5a6a7e">kcal/วัน</div></div>
+          <div><div style="font-size:10px;color:#5a6a7e">โปรตีนรวม</div><div style="font-size:18px;font-weight:700;color:#1b5e20">${f(gotD.prot,1)}</div><div style="font-size:10px;color:#5a6a7e">g/วัน</div></div>
+        </div>
+      </div>
+    `;
+    tbody.innerHTML=[
+      ['พลังงาน (kcal)',f(gotM.kcal,0),f(gotD.kcal,0),reqK,pct(gotD.kcal,reqK)],
+      ['โปรตีน (g)',f(gotM.prot,1),f(gotD.prot,1),reqP>0?reqP:'—',reqP>0?pct(gotD.prot,reqP):'—'],
+      ['คาร์โบไฮเดรต (g)',f(gotM.cho,1),f(gotD.cho,1),'—','—'],
+      ['ไขมัน (g)',f(gotM.fat,1),f(gotD.fat,1),'—','—'],
+      ['ใยอาหาร (g)',f(gotM.fb,1),f(gotD.fb,1),'—','—'],
+      ['โซเดียม (mg)',f(gotM.na,0),f(gotD.na,0),'<2300','—'],
+      ['โพแทสเซียม (mg)',f(gotM.k,0),f(gotD.k,0),'—','—'],
+      ['ฟอสฟอรัส (mg)',f(gotM.ph,0),f(gotD.ph,0),'—','—'],
+      ['ผง (g)',f(gPerMeal,1),f(gPerDay,1),'—','—'],
+      [p.sc>0?'ช้อนตวง':'ซอง',p.sc>0?f(scPerMeal,2):f(mlPerMeal/p.vol,2),p.sc>0?f(scPerDay,1):f(mlPerDay/p.vol,1),'—','—'],
+      ['น้ำที่เติม (ml)',f(waterPerMeal,0),f(waterPerMeal*meals,0),'—','—'],
+    ].map(r=>`<tr><td>${r[0]}</td><td class="hl">${r[1]}</td><td class="gr">${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join('');
+
+    if(userConc>p.std_conc*1.5&&p.std_conc>0) warnText+='⚠️ ความเข้มข้นสูงกว่ามาตรฐานมาก → Osmolarity อาจสูง ระวังท้องเสีย\n';
+    if(p.sc>0&&scPerMeal>0&&Math.abs(scPerMeal-scR)/scPerMeal>0.1) warnText+=`⚠️ ช้อนที่แม่นยำ = ${f(scPerMeal,2)} ช้อน → ปัดเป็น ${f(scR,1)} ช้อน (${f(gR,0)}g ≈ ${f(kcalR,0)} kcal/มื้อ)\n`;
+    if(reqP>0&&gotD.prot<reqP*0.8) warnText+='⚠️ โปรตีนยังต่ำกว่าเป้า → พิจารณาเสริม Fresubin Protein หรือ Boost Beneprotein';
+
+  } else {
+    const fixedConc=p.std_conc||1.0;
+    const mlPerDay=reqK/fixedConc, mlPerMeal=mlPerDay/meals;
+    const fac=mlPerDay/100;
+    const gotD={kcal:p.kcal*fac,prot:p.prot*fac,cho:p.cho*fac,fat:p.fat*fac,fb:(p.fb||0)*fac,na:(p.na||0)*fac,k:(p.k||0)*fac,ph:(p.ph||0)*fac};
+    const gotM={kcal:gotD.kcal/meals,prot:gotD.prot/meals,cho:gotD.cho/meals,fat:gotD.fat/meals,fb:gotD.fb/meals,na:gotD.na/meals,k:gotD.k/meals,ph:gotD.ph/meals};
+
+    document.getElementById('conc-hint').textContent=`ผลิตภัณฑ์ชนิดนี้มีความเข้มข้นคงที่ ${fixedConc} kcal/ml ตามสูตรผู้ผลิต`;
+    const kp=fp(gotD.kcal,reqK);
+    document.getElementById('bkv').textContent=`${f(gotD.kcal,0)} / ${reqK} kcal`;
+    document.getElementById('bkf').style.width=kp+'%'; document.getElementById('bkf').className='prog-fill ok';
+    if(reqP>0){const pp=fp(gotD.prot,reqP);document.getElementById('bpv').textContent=`${f(gotD.prot,1)} / ${reqP} g`;const pf=document.getElementById('bpf');pf.style.width=pp+'%';pf.className='prog-fill'+(pp>=85?' ok':' warn');}
+    else{document.getElementById('bpv').textContent=`${f(gotD.prot,1)} g`;document.getElementById('bpf').style.width='0%';}
+
+    cards.innerHTML=`
+      <div style="grid-column:1/-1;background:#e8f4fd;border:1.5px solid #90caf9;border-radius:10px;padding:12px 14px;margin-bottom:2px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#1565c0;margin-bottom:8px">📋 ต่อมื้อ (${meals} มื้อ/วัน)</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px">
+          <div><div style="font-size:10px;color:#5a6a7e">ปริมาณ</div><div style="font-size:18px;font-weight:700;color:#0f4c75">${f(mlPerMeal,0)}</div><div style="font-size:10px;color:#5a6a7e">ml/มื้อ</div></div>
+          <div><div style="font-size:10px;color:#5a6a7e">พลังงาน</div><div style="font-size:18px;font-weight:700;color:#0f4c75">${f(gotM.kcal,0)}</div><div style="font-size:10px;color:#5a6a7e">kcal/มื้อ</div></div>
+          <div><div style="font-size:10px;color:#5a6a7e">โปรตีน</div><div style="font-size:18px;font-weight:700;color:#0f4c75">${f(gotM.prot,1)}</div><div style="font-size:10px;color:#5a6a7e">g/มื้อ</div></div>
+          <div><div style="font-size:10px;color:#5a6a7e">คาร์โบไฮเดรต</div><div style="font-size:18px;font-weight:700;color:#0f4c75">${f(gotM.cho,1)}</div><div style="font-size:10px;color:#5a6a7e">g/มื้อ</div></div>
+          <div><div style="font-size:10px;color:#5a6a7e">ไขมัน</div><div style="font-size:18px;font-weight:700;color:#0f4c75">${f(gotM.fat,1)}</div><div style="font-size:10px;color:#5a6a7e">g/มื้อ</div></div>
+        </div>
+      </div>
+      <div style="grid-column:1/-1;background:#e8f5e9;border:1.5px solid #a5d6a7;border-radius:10px;padding:12px 14px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#1b5e20;margin-bottom:8px">📊 รวมทั้งวัน</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px">
+          <div><div style="font-size:10px;color:#5a6a7e">ปริมาณรวม</div><div style="font-size:18px;font-weight:700;color:#1b5e20">${f(mlPerDay,0)}</div><div style="font-size:10px;color:#5a6a7e">ml/วัน</div></div>
+          <div><div style="font-size:10px;color:#5a6a7e">พลังงานรวม</div><div style="font-size:18px;font-weight:700;color:#1b5e20">${f(gotD.kcal,0)}</div><div style="font-size:10px;color:#5a6a7e">kcal/วัน</div></div>
+          <div><div style="font-size:10px;color:#5a6a7e">โปรตีนรวม</div><div style="font-size:18px;font-weight:700;color:#1b5e20">${f(gotD.prot,1)}</div><div style="font-size:10px;color:#5a6a7e">g/วัน</div></div>
+          <div><div style="font-size:10px;color:#5a6a7e">คาร์โบไฮเดรต</div><div style="font-size:18px;font-weight:700;color:#1b5e20">${f(gotD.cho,1)}</div><div style="font-size:10px;color:#5a6a7e">g/วัน</div></div>
+          <div><div style="font-size:10px;color:#5a6a7e">ไขมัน</div><div style="font-size:18px;font-weight:700;color:#1b5e20">${f(gotD.fat,1)}</div><div style="font-size:10px;color:#5a6a7e">g/วัน</div></div>
+        </div>
+      </div>
+    `;
+    tbody.innerHTML=[
+      ['พลังงาน (kcal)',f(gotM.kcal,0),f(gotD.kcal,0),reqK,pct(gotD.kcal,reqK)],
+      ['โปรตีน (g)',f(gotM.prot,1),f(gotD.prot,1),reqP>0?reqP:'—',reqP>0?pct(gotD.prot,reqP):'—'],
+      ['คาร์โบไฮเดรต (g)',f(gotM.cho,1),f(gotD.cho,1),'—','—'],
+      ['ไขมัน (g)',f(gotM.fat,1),f(gotD.fat,1),'—','—'],
+      ['ใยอาหาร (g)',f(gotM.fb,1),f(gotD.fb,1),'—','—'],
+      ['โซเดียม (mg)',f(gotM.na,0),f(gotD.na,0),'—','—'],
+      ['โพแทสเซียม (mg)',f(gotM.k,0),f(gotD.k,0),'—','—'],
+      ['ฟอสฟอรัส (mg)',f(gotM.ph,0),f(gotD.ph,0),'—','—'],
+      ['ปริมาณ (ml)',f(mlPerMeal,0),f(mlPerDay,0),'—','—'],
+    ].map(r=>`<tr><td>${r[0]}</td><td class="hl">${r[1]}</td><td class="gr">${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join('');
+  }
+
+  const warnEl=document.getElementById('warn');
+  warnEl.textContent=warnText.trim(); warnEl.style.display=warnText?'block':'none';
+  document.getElementById('note').textContent='*คำนวณย้อนกลับจากพลังงานที่ต้องการ | ข้อมูลจากฉลากผลิตภัณฑ์จริง | ควรปรับตามสภาพคลินิกและคำแนะนำแพทย์';
+}
+
+// ============ ADMIN ============
+function renderAdmin(){
+  const filterTabs = document.getElementById('admin-filter-tabs');
+  const allGroups = ['all',...new Set(products.map(p=>p.gr))];
+  filterTabs.innerHTML = allGroups.map(g=>`
+    <div class="admin-tab ${adminFilter===g?'on':''}" onclick="setAdminFilter('${g}')">${g==='all'?'ทั้งหมด':(GRP_LABELS[g]||g)}</div>
+  `).join('');
+
+  const list = document.getElementById('product-list');
+  const filtered = adminFilter==='all' ? products : products.filter(p=>p.gr===adminFilter);
+  if(filtered.length===0){
+    list.innerHTML='<div class="empty"><div class="empty-icon">📦</div><div class="empty-text">ไม่มีผลิตภัณฑ์ในกลุ่มนี้</div></div>';
+    return;
+  }
+  list.innerHTML = filtered.map(p=>`
+    <div class="product-item">
+      <div>
+        <div class="pi-name">${p.n}</div>
+        <div class="pi-brand">${GRP_LABELS[p.gr]||p.gr} | ${p.t==='pwd'?'ผงชง':'ชนิดน้ำ'} | ${p.kcal} kcal/serving</div>
+      </div>
+      <div class="pi-btns">
+        <button class="btn btn-outline btn-sm" onclick="editProduct('${p.id}')">✏️ แก้ไข</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}')">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function setAdminFilter(g){ adminFilter=g; renderAdmin(); }
+
+// ============ MODAL ============
+function openModal(id=null){
+  document.getElementById('edit-id').value = id||'';
+  document.getElementById('modal-title').textContent = id?'แก้ไขผลิตภัณฑ์':'เพิ่มผลิตภัณฑ์';
+  const fields = ['name','brand','group','type','stdconc','sc','g','vol','kcal','prot','cho','fat','fb','na','k','ph','indic','note'];
+  if(id){
+    const p=getP(id); if(!p) return;
+    document.getElementById('f-name').value=p.n;
+    document.getElementById('f-brand').value=p.br;
+    document.getElementById('f-group').value=p.gr;
+    document.getElementById('f-type').value=p.t;
+    document.getElementById('f-stdconc').value=p.std_conc||1.0;
+    document.getElementById('f-sc').value=p.sc||0;
+    document.getElementById('f-g').value=p.g||0;
+    document.getElementById('f-vol').value=p.vol||0;
+    document.getElementById('f-kcal').value=p.kcal||0;
+    document.getElementById('f-prot').value=p.prot||0;
+    document.getElementById('f-cho').value=p.cho||0;
+    document.getElementById('f-fat').value=p.fat||0;
+    document.getElementById('f-fb').value=p.fb||0;
+    document.getElementById('f-na').value=p.na||0;
+    document.getElementById('f-k').value=p.k||0;
+    document.getElementById('f-ph').value=p.ph||0;
+    document.getElementById('f-indic').value=p.indic||'';
+    document.getElementById('f-note').value=p.note||'';
+  } else {
+    document.getElementById('f-name').value='';
+    document.getElementById('f-brand').value='blue';
+    document.getElementById('f-group').value='g1';
+    document.getElementById('f-type').value='pwd';
+    document.getElementById('f-stdconc').value=1.0;
+    ['sc','g','vol','kcal','prot','cho','fat','fb','na','k','ph'].forEach(f=>document.getElementById('f-'+f).value=0);
+    document.getElementById('f-indic').value='';
+    document.getElementById('f-note').value='';
+  }
+  document.getElementById('modal').classList.add('on');
+}
+
+function closeModal(){ document.getElementById('modal').classList.remove('on'); }
+
+function saveProduct(){
+  const name=document.getElementById('f-name').value.trim();
+  if(!name){ showToast('❌ กรุณากรอกชื่อผลิตภัณฑ์'); return; }
+  const editId=document.getElementById('edit-id').value;
+  const prod = {
+    id: editId || 'p_'+Date.now(),
+    n: name,
+    br: document.getElementById('f-brand').value,
+    gr: document.getElementById('f-group').value,
+    t: document.getElementById('f-type').value,
+    std_conc: parseFloat(document.getElementById('f-stdconc').value)||1.0,
+    sc: parseFloat(document.getElementById('f-sc').value)||0,
+    g: parseFloat(document.getElementById('f-g').value)||0,
+    vol: parseFloat(document.getElementById('f-vol').value)||0,
+    kcal: parseFloat(document.getElementById('f-kcal').value)||0,
+    prot: parseFloat(document.getElementById('f-prot').value)||0,
+    cho: parseFloat(document.getElementById('f-cho').value)||0,
+    fat: parseFloat(document.getElementById('f-fat').value)||0,
+    fb: parseFloat(document.getElementById('f-fb').value)||0,
+    na: parseFloat(document.getElementById('f-na').value)||0,
+    k: parseFloat(document.getElementById('f-k').value)||0,
+    ph: parseFloat(document.getElementById('f-ph').value)||0,
+    indic: document.getElementById('f-indic').value.trim(),
+    note: document.getElementById('f-note').value.trim(),
+  };
+  if(editId){
+    const idx=products.findIndex(p=>p.id===editId);
+    if(idx>=0) products[idx]=prod;
+  } else {
+    products.push(prod);
+  }
+  saveProducts();
+  buildBrandSections();
+  renderAdmin();
+  closeModal();
+  showToast(editId?'✅ อัปเดตข้อมูลแล้ว':'✅ เพิ่มผลิตภัณฑ์แล้ว');
+}
+
+function editProduct(id){ openModal(id); }
+
+function deleteProduct(id){
+  if(!confirm('ยืนยันการลบผลิตภัณฑ์นี้?')) return;
+  products=products.filter(p=>p.id!==id);
+  saveProducts();
+  buildBrandSections();
+  renderAdmin();
+  showToast('🗑️ ลบผลิตภัณฑ์แล้ว');
+}
+
+// ============ EXPORT / IMPORT ============
+function exportData(){
+  const blob=new Blob([JSON.stringify(products,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='nutrition_products_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  showToast('📥 ส่งออกข้อมูลแล้ว');
+}
+
+function importData(input){
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      if(!Array.isArray(data)) throw new Error('Invalid format');
+      products=data;
+      saveProducts();
+      buildBrandSections();
+      renderAdmin();
+      showToast('📤 นำเข้าข้อมูลแล้ว '+data.length+' รายการ');
+    } catch(err){ showToast('❌ ไฟล์ไม่ถูกต้อง'); }
+  };
+  reader.readAsText(file);
+  input.value='';
+}
+
+function resetToDefault(){
+  if(!confirm('รีเซ็ตข้อมูลทั้งหมดเป็นค่าเริ่มต้น? การแก้ไขทั้งหมดจะหายไป')) return;
+  products=JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+  saveProducts();
+  buildBrandSections();
+  renderAdmin();
+  showToast('🔄 รีเซ็ตเรียบร้อย');
+}
+
+// ============ TOAST ============
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),2500);
+}
+
+// ============ INIT ============
+loadProducts();
+buildBrandSections();
+</script>
+</body>
+</html>
